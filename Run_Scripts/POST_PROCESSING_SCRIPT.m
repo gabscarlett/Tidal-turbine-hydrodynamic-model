@@ -11,14 +11,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % ASSIGN PATHS TO FUNCTIONS AND DATA: WORK PC
-path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\functions')); % Functions
-path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\data')); % Input data
-path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\Saved_Simulation_data')); % Saved simulation data
+% path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\functions')); % Functions
+% path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\data')); % Input data
+% path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\Saved_Simulation_data')); % Saved simulation data
 
 % ASSIGN PATHS TO FUNCTIONS AND DATA: HOME W520
-path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\functions')); % Functions
-path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\data')); % Input data
-path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\Saved_Simulation_data')); % Saved simulation data
+path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\functions')); % Functions
+path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\data')); % Input data
+path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\Saved_Simulation_data')); % Saved simulation data
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GLOBAL SCRIPT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -29,37 +29,40 @@ path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % ITERATES OVER 3 BLADES
-% USES MEASURED REDAPT FLOW DATA AND INDUCTION FACTORS FROM COUPLED MODEL
+% % USES MEASURED ONSET FLOW DATA FROM REDAPT AND INDUCTION FACTORS FROM COUPLED MODEL
 
 
-% DETERMINED BENDING MOMENTS, POWER AND THRUST COEFFICIENT FOR THE ROTOR
-% DETERMINED LOCAL MEAN SECTIONAL LOAD, MOMENT AN TORQUE COEFFICIENTS
-% COMPARES THE UNSTEADY, QUASI-STEADY AND STEADY ANALYSIS
+% DETERMINED BENDING MOMENTS, POWER AND THRUST COEFFICIENTS FOR THE ROTOR
+% DETERMINED LOCAL MEAN SECTIONAL LOAD, MOMENT AND TORQUE COEFFICIENTS
+% COMPARES UNSTEADY, QUASI-STEADY AND STEADY PREDICTION
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%
 % INITIALISATION CALLS
 % FOLLOWING CALLS TO PRE-PROCESS DATA
-
-% 1: CALL TO VitExt             - Extrapolate 2D airfoil data (1D array)
-% 2: CALL TO sep_point          - Determine 2D point of separation (1D array)
-% 3: CALL TO stall_delay        - Determine 3D Cl and Cd along blade due to rotation (2D array)
-% 4: CALL TO VitExt             - Extrapolate 3D airfoil data (2D array)
-% 5: CALL TO sep_point          - Determine 3D point of separation (2D array)
-                                
-
+%
+% 1: CALL TO PreProcessor1       - Extrapolate static aerofoil data
+%                                  to deep stall region.
+%                                - Apply rotational augmentation
+%                                  correction
+%                                - Compute the point of trailing edge separation
+%                                
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BLADE LOADS
 % FOLLOWING CALLS MADE 
-
-% 6:  CALL TO wag                 - Determine unsteady linear Cl for each blade(2D array)
-% 7:  CALL TO DS_2D               - Determine 2D unsteady non-linear Cl and Cd  for each blade (2D array)
-% 8:  CALL TO DS_3D               - Determine 3D unsteady non-linear Cl and Cd  for each blade (2D array)
-% 9:  CALL TO loads               - Determine the power, thrust, and moments for each blade
-% 10: CALL TO BEM_steady          - Induction factors determined for steady analysis 
-% 12: CALL TO GRAPHS              - Produced graphs for Renewable Energy paper 
+%
+% 2:  CALL TO wag                 - Determine unsteady linear Cl for each blade(2D array)
+% 3:  CALL TO DS_2D               - Determine 2D unsteady non-linear Cl and Cd  for each blade (2D array)
+% 4:  CALL TO DS_3D               - Determine 3D unsteady non-linear Cl and for each blade (2D array)
+% 5:  CALL TO UnstCD              - Determine 3D unsteady non-linear Cd and for each blade (2D array)
+% 6:  CALL TO loads               - Determine the power, thrust, and moments for each blade (UNSTEADY)
+% 7:  CALL TO loads               - Determine the power, thrust, and moments for each blade (QUASI-STEADY)
+% 8:  CALL TO Steady              - Determine steady state components 
+% 9:  CALL TO GRAPHS              - Produced graphs for Renewable Energy paper 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,17 +74,17 @@ clear, clc, close all
 
 %%%%%%%%%%%%%%%%%%%%%% Operating conditions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TSR=3.5;                % tip speed ratio
+% TSR=3.5;                   % tip speed ratio
 % load ReDAPT_Unsteady_TSR_3p5
-% Pitch = 1;              % pitch angle (deg) 4.5 = 0.1, 4 = -0.4, 3.5 = 1,
+% Pitch = 1.2;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
 
 % TSR=4.0;                   % tip speed ratio
 % load ReDAPT_Unsteady_TSR_4
-% Pitch = -0.4;              % pitch angle (deg) 4.5 = 0.1, 4 = -0.4, 3.5 = 1,
+% Pitch = -0.4;              % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
 
 TSR=4.5;                   % tip speed ratio
 load ReDAPT_Unsteady_TSR_4p5
-Pitch = 0.1;               % pitch angle (deg) 4.5 = 0.1, 4 = -0.4, 3.5 = 1,
+Pitch = 0.1;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
 
 
 U0=2.77;                % streamwise current (m/s)
@@ -217,11 +220,8 @@ for i=1:Blades
         % ROTATIONAL AUGMENTATION SOLUTION
         [~,~,Cl_DS_3D(:,:,i), Dvis, Cd_Ind, ff_3d(:,:,i), fff_3d(:,:,i), VortexTracker_3d(:,:,1)] =.....
             DS_3D(B,c,Values_360r,r,Cl_us(:,:,i),Cl_c,Cl_nc,Ds,aE(:,:,i),deg2rad(AoA(:,:,i)));        
-        
-        %CD(:,:,i)=Cn_DS_3D(:,:,i).*sin(deg2rad(AoA(:,:,i)))-Ct_DS_3D(:,:,i).*cos(deg2rad(AoA(:,:,i)))+Cd0;
-        
-        % DRAG ROTATIONAL
-        
+                
+        % DRAG ROTATIONAL 
         [Cd_DS_3D(:,:,i)] = UnstCD(Dvis,Cd_Ind,aoa,Cd_2d,Values_360r,aE(:,:,i),r,Cd0);
     
         
@@ -269,11 +269,9 @@ for i=1:Blades
 end
         
 
-
         %% STEADY ANALYSIS
         
-        [P_s,T_s, Cl_S3d, Cd_S3d, CN_S3d, CT_S3d, AoA_s, MZs, MXs] = Steady_Analysis(U0,TSR,pitch,Blades,t,rho,omega,NBsec);
-
+        [P_s, T_s, Cl_S3d, Cd_S3d, CN_S3d, CT_S3d, AoA_s, MZs, MXs, f] = Steady(U0,TSR,pitch,Blades,t,rho,omega,NBsec);
 
 
         %% SEPERATION POINT
@@ -291,11 +289,6 @@ end
         InRange2=f_3d>0.99;
         f_3d(InRange2)=1;
         
-        % Steady (non-rotational) separation point
-        f=interp2(r,Values_360r.Alpha,Values_360r.F,rr,deg2rad(AoA_s),'spline');
-        InRange3=f>0.999;
-        f(InRange3)=1;
-
        %% CALL GRAPH FUNCTION TO MAKE PLOTS 
        % FOR (RENEWABLE ENERGY JOURNAL 2018)
         

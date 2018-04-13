@@ -103,7 +103,16 @@ ylabel('$$\bar{C_Q}$$')
 xlabel('$$r/R$$')
 %print('mean_cl_cd','-depsc2','-r1000');
 
- 
+% plot mean sectional angle of attack
+aSteady=mean(AoA_s,2);
+aUnsteady=mean(AoA(:,:,1),2);
+
+graph_settings
+figure(500)
+plot(r/R,aSteady,'r',r/R,aUnsteady,'k')
+ylabel('$$\alpha$$ [deg]')
+xlabel('$$r/R$$')
+legend('Steady','Unsteady mean') 
 %% % MULTI PLOT SHOWING THE EFFECTS OF UNSTEADINESS AT 3 BLADE LOCATIONS
 X=95;
 XX=30;

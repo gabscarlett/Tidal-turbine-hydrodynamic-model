@@ -10,27 +10,10 @@
 %%%                                                                 %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% USES MEASURED REDAPT FLOW DATA AS AN INPUT
-
-% CALCULATES THE UNSTEADY INDUCTION FACTORS WHICH
-% ACCOUNT FOR DYNAMIC STALL AND ROTATIONAL AUGMENTATION
-
-% This script determines axial and tangential induction factors by
-% calculating the non-linear, rotational, unsteady lift and drag 
-% coefficients at each blade section. Look up tables are formed
-% with the unsteady values by binning and smoothing them. The simulation
-% run until the induction factors converge.
-
-% The initial conditions are only required when a new dataset is used. 
-% The initial conditions determines the induction (quasi-steady) factors
-% and the axial and tangential velocities acting on EACH blade. The
-% induction factors are detemined using blade 1 only. However, for CP and
-% CT data is required for each blade.
-
 % ASSIGN PATHS TO FUNCTIONS AND DATA: WORK PC
-path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\functions')); % Functions
-path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\data')); % Input data
-path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\Saved_Simulation_data')); % Saved simulation data
+path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\functions')); % Functions
+path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\data')); % Input data
+path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\Saved_Simulation_data')); % Saved simulation data
  
 % ASSIGN PATHS TO FUNCTIONS AND DATA: HOME W520
 path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\functions')); % Functions
@@ -39,18 +22,81 @@ path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\
  
  
 % ASSIGN PATHS TO FUNCTIONS AND DATA: WORK MACPRO
-path(path,genpath('/Users/s1040865/Dropbox/PhD/Modelling/Programs/Matlab/2018/PATH/functions')); % Function path
-path(path,genpath('/Users/s1040865/Dropbox/PhD/Modelling/Programs/Matlab/2018/PATH/data')); % Data path
-path(path,genpath('/Users/s1040865/Dropbox/PhD/Modelling/Programs/Matlab/2018/PATH/Saved_Simulation_data')); % Saved simulation data
+path(path,genpath('/Users/s1040865/Dropbox/PhD/Modelling/Programs/Matlab/Working_Folder_April_2018/PATH/functions')); % Function path
+path(path,genpath('/Users/s1040865/Dropbox/PhD/Modelling/Programs/Matlab/Working_Folder_April_2018/PATH/data')); % Data path
+path(path,genpath('/Users/s1040865/Dropbox/PhD/Modelling/Programs/Matlab/2018/Working_Folder_April_2018/Saved_Simulation_data')); % Saved simulation data
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GLOBAL SCRIPT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% COUPLED MODEL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% USES MEASURED ONSET FLOW DATA FROM REDAPT AS AN INPUT
+
+% CALCULATES THE UNSTEADY INDUCTION FACTORS WHICH
+% ACCOUNT FOR DYNAMIC STALL AND ROTATIONAL AUGMENTATION
+
+% This script determines axial and tangential induction factors by
+% calculating the non-linear, rotational, unsteady lift and drag 
+% coefficients at each blade section. Look up tables are formed
+% with the unsteady values by binning and smoothing them. The simulation
+% runs until the induction factors converge.
+
+
+% The initial conditions are only required when a new dataset is used. 
+% The initial conditions determines the induction (quasi-steady) factors
+% and the axial and tangential velocities acting on EACH blade. The
+% induction factors are detemined using blade 1 only. However, for CP and
+% CT data is required for each blade.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% INITIALISATION CALLS
+% FOLLOWING CALLS TO PRE-PROCESS DATA
+%
+% 1: CALL TO PreProcessor1       - Extrapolate static aerofoil data
+%                                  to deep stall region.
+%                                - Apply rotational augmentation
+%                                  correction
+%                                - Compute the point of trailing edge separation
+% 2: CALL TO InitialConditions   - Calculate velocities and induction factors for first rotation (QUASI-STEADY)
+% 3: CALL TO MeanInduction       - Time average and clean induction factors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BLADE LOADS
+% FOLLOWING CALLS MADE 
+%
+% 2:  CALL TO wag                 - Determine unsteady linear Cl for each blade(2D array)
+% 3:  CALL TO DS_3D               - Determine 3D unsteady non-linear Cl and Cd  for each blade (2D array)
+% 4:  CALL TO UnstCD              - Determine 3D unsteady non-linear Cd and for each blade (2D array)
+% 5:  CALL TO UNSTEADY_POLARS     - Bin and average unsteady coefficients and compile look-up table
+% 6:  CALL TO VitExt              - Extrapolate look-up table (2D array)
+% 7:  CALL TO BEM_TIME_UNSTEADY   - Compute induction factors at each time step through period of revolution
+% 8:: CALL TO MeanInduction       - Time average and clean the unsteady induction factors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear, clc, close all
 
         %% inputs
 
         % Operating conditions 
+        
+        % TSR=3.5;                   % tip speed ratio
+        % load ReDAPT_Unsteady_TSR_3p5
+        % Pitch = 1.2;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
 
-        TSR=4.5;                    % tip speed ratio : 4.5, 4, 3.5
-        Pitch = 0.1;                % pitch angle (deg): 4.5 = 0.1, 4 = -0.4, 3.5 = 1, 
+        % TSR=4.0;                   % tip speed ratio
+        % load ReDAPT_Unsteady_TSR_4
+        % Pitch = -0.4;              % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+
+        TSR=4.5;                   % tip speed ratio
+        load ReDAPT_Unsteady_TSR_4p5
+        Pitch = 0.1;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+        
         U0=2.77;                    % streamwise current (m/s)
         ZTb=18;                     % distance from bed to the hub centre (m)
 
@@ -133,7 +179,7 @@ while Err > Ep
 
         j=1+j;
     
-        if j>n*5 % every 5 iterations reduce the convergence parameter 
+        if j>n*5 % if no convergence after 5 iterations relax the convergence parameter 
             Ep=Ep*10;
             n=n+1;
         end
