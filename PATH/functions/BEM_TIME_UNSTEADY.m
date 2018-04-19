@@ -68,8 +68,8 @@ parfor i=1:length(r)-1
             
             % access polars for radial section   
             
-            Cl=Values_360.Cl(i,:);
-            Cd=Values_360.Cd(i,:);
+            Cl=Values_360.Cl(:,i);
+            Cd=Values_360.Cd(:,i);
 
 while (max(Err) > Ep)
   j=1+j;
