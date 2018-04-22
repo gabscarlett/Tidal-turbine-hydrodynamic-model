@@ -1,4 +1,4 @@
-function [Cd_DS_3D] = UnstCD(Dvis,Cd_Ind,aoa,Cd_2d,Values_360r,aE,r,Cd0)
+function [Cd_DS_3D] = UnstCD(Dvis,Cd_Ind,Values_360,Values_360r,aE,r,Cd0)
         
         R_InRange=(r>0.8*r(end));        % boolean (TRUE for outer section) 
         % DRAG 3D
@@ -7,7 +7,7 @@ function [Cd_DS_3D] = UnstCD(Dvis,Cd_Ind,aoa,Cd_2d,Values_360r,aE,r,Cd0)
         
         % No rotational correction for outer sections to avoid over
         % prediction (drag reduces from 0.8R - R during rotation)
-        Cd_2St=interp1(aoa,Cd_2d,aE(R_InRange,:),'spline');   
+        Cd_2St=interp1(Values_360.Alpha,Values_360.Cd,aE(R_InRange,:),'spline');   
         rr=r(~R_InRange)'.*ones(size(aE(~R_InRange,:)));
         
         %%

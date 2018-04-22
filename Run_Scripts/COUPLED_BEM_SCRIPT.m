@@ -16,10 +16,9 @@ path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\Working
 path(path,genpath('\Users\s1040865\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\Saved_Simulation_data')); % Saved simulation data
  
 % ASSIGN PATHS TO FUNCTIONS AND DATA: HOME W520
-path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\functions')); % Functions
-path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\data')); % Input data
-path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\2018\PATH\Saved_Simulation_data')); % Saved simulation data
- 
+path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\functions')); % Functions
+path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\data')); % Input data
+path(path,genpath('\Users\gabsc\Dropbox\PhD\Modelling\Programs\Matlab\Working_Folder_April_2018\PATH\Saved_Simulation_data')); % Saved simulation data  
  
 % ASSIGN PATHS TO FUNCTIONS AND DATA: WORK MACPRO
 path(path,genpath('/Users/s1040865/Dropbox/PhD/Modelling/Programs/Matlab/Working_Folder_April_2018/PATH/functions')); % Function path
@@ -86,23 +85,21 @@ clear, clc, close all
         % Operating conditions 
         
         % TSR=3.5;                   % tip speed ratio
-        % load ReDAPT_Unsteady_TSR_3p5
         % Pitch = 1.2;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
 
         % TSR=4.0;                   % tip speed ratio
-        % load ReDAPT_Unsteady_TSR_4
-        % Pitch = -0.4;              % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+        % Pitch = 0.2;              % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
 
         TSR=4.5;                   % tip speed ratio
-        load ReDAPT_Unsteady_TSR_4p5
-        Pitch = 0.1;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+        Pitch = 0.9;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
         
         U0=2.77;                    % streamwise current (m/s)
         ZTb=18;                     % distance from bed to the hub centre (m)
 
 
         %%%%%%%%%%%%%%%%%%%% Turbine specifications %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        load TGL_BLADE_PROFILE
+        file_turb ='TGL_TURBINE';
+        load(file_turb)
         % THIS IS THE FULL SCALE TGL BLADE GIVEN BY GRETTON
         Blades =3;
         pitch=deg2rad(Pitch); % operational pitch applied (degree)
@@ -116,17 +113,18 @@ clear, clc, close all
         omega = abs(U0*TSR/R);      % rotational speed of blades (rad/s)
         Tr = (2*pi)/omega;          % period of rotation (s)
 
-
-        load ReDAPT_FlowSample % ReDAPT flow data
+        file_flow = 'ReDAPT_FlowSample'; % ReDAPT flow data
+        load(file_flow)
 
         dt=Tr/72; % dt= 5 degrees
 
         %% PREPROCESSOR
         % ROTATONAL AUGMENTATION / STALL DELAY / SEPARATION POINT
     
-        load S814_static_data
+        file_foil = 'S814_static_data';
+        load(file_foil)
         
-        [~, Values_360r] = PreProcessor1(aoa,Cl_2d,Cd_2d,Cn_2d,Clin,LinRange,B,r,c,az);
+        [Values_360, Values_360r] = PreProcessor1(aoa,Cl_2d,Cd_2d,Cn_2d,Clin,LinRange,B,r,c,az);
         
 
         %% INITIAL CONDITIONS  
@@ -146,8 +144,9 @@ clear, clc, close all
 %         "Initial conditions completed"
         
         
-        
-        load Initial_conditions_TSR_4p5
+        file_init = 'Initial_conditions_TSR_4p5';
+        load(file_init)
+
          
 
          % starting values
@@ -211,7 +210,7 @@ while Err > Ep
         
         % DRAG
         
-        [Cd_DS_3D(:,:,ii)] = UnstCD(Dvis,Cd_Ind,aoa,Cd_2d,Values_360r,aE,r,Cd0);
+        [Cd_DS_3D(:,:,ii)] = UnstCD(Dvis,Cd_Ind,Values_360,Values_360r,aE,r,Cd0);
        end
      
         % Avoid numerical issues with end nodes where flow tends to zero
@@ -244,7 +243,7 @@ while Err > Ep
         
         for k =1:length(r)
         % Extrapolate unsteady coefficients through 360 degrees  (-180 <-> 180)
-        [Values_360u.Alpha, Values_360u.Cl(k,:), Values_360u.Cd(k,:),~] = VitExt(ValuesOut.aoa(k,:),ValuesOut.Cl(k,:),ValuesOut.Cd(k,:));
+        [Values_360u.Alpha, Values_360u.Cl(:,k), Values_360u.Cd(:,k),~] = VitExt(ValuesOut.aoa(k,:),ValuesOut.Cl(k,:),ValuesOut.Cd(k,:));
         end
 
         %% CALCULATE INDUCTION FACTORS USING UNSTEADY POLARS

@@ -12,7 +12,7 @@
 
 
 
-function [P_s, T_s, Cl_S3d, Cd_S3d, CN_S3d, CT_S3d, AoA_s, MZs, MXs, f] = Steady(U0,TSR,pitch,Blades,t,rho,omega,NBsec)
+function [P_s, T_s, Cl_S3d, Cd_S3d, CN_S3d, CT_S3d, AoA_s, MZs, MXs, f] = Steady(U0,TSR,pitch,t,rho,omega,NBsec,file_turb,file_foil)
 
 
         % Executes a steady state analysis of the loads and flow acting on and around the rotor of a tidal turbine.
@@ -35,11 +35,11 @@ function [P_s, T_s, Cl_S3d, Cd_S3d, CN_S3d, CT_S3d, AoA_s, MZs, MXs, f] = Steady
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         % DISCRETISE BLADE
-        load TGL_blade_profile
+        load(file_turb)
         r=linspace(rad(1),rad(end),NBsec);
         B=interp1(rad,B,r,'PCHIP')+pitch; c=interp1(rad,c,r,'PCHIP');
         
-        load S814_static_data
+        load(file_foil)
         
         % PREPROCESSOR
         [~, Values_360r] = PreProcessor1(aoa,Cl_2d,Cd_2d,Cn_2d,Clin,LinRange,B,r,c,az);

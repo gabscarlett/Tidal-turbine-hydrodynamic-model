@@ -75,30 +75,32 @@ clear, clc, close all
 %%%%%%%%%%%%%%%%%%%%%% Operating conditions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TSR=3.5;                   % tip speed ratio
-% load ReDAPT_Unsteady_TSR_3p5
+% file_sim = 'ReDAPT_Unsteady_TSR_3p5';
 % Pitch = 1.2;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
 
 % TSR=4.0;                   % tip speed ratio
-% load ReDAPT_Unsteady_TSR_4
-% Pitch = -0.4;              % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+% file_sim = 'ReDAPT_Unsteady_TSR_4';
+% Pitch = 0.2;              % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
 
 TSR=4.5;                   % tip speed ratio
-load ReDAPT_Unsteady_TSR_4p5
-Pitch = 0.1;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+file_sim = 'ReDAPT_Unsteady_TSR_4p5';
+Pitch = 0.9;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
 
+load(file_sim)
 
 U0=2.77;                % streamwise current (m/s)
-ZTb=18;                 % distance from bed to hub centre
+% Hh:                   % distance from bed to hub centre
 
 g=9.81;                 % acceleration due to gravity (m/s^2)
 rho = 1025;             % density of sea water (kg/m^3)
 
 
 %%%%%%%%%%%%%%%%%%%% Turbine specifications %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-load TGL_blade_profile
+file_turb ='TGL_TURBINE';
+load(file_turb)
 
 % THIS IS THE FULL SCALE TGL BLADE GIVEN BY GRETTON
-Blades =3;              % number of blades
+% Blades:               % number of blades
 pitch=deg2rad(Pitch);   % operational pitch applied (degree)
 
 % Discretise blade
@@ -117,14 +119,15 @@ omega = abs(U0*TSR/R);      % rotational speed of blades (rad/s)
 Tr = (2*pi)/omega;          % period of rotation (s)
 
 %%%%%%%%%%%%%%%%%%%%%%% LOAD REDAPT DATA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-         load ReDAPT_FlowSample
+        
+         file_flow = 'ReDAPT_FlowSample';
+         load(file_flow)
 
 
          U1 = double(data.adcp1.U);  % streamwise ReDAPT velocity
          W1 = double(data.adcp1.W);  % depthwise ReDAPT velocity
          depth=size(U1,2)-1;         % water depth 
-         z0=-depth-1+ZTb;            % hub depth (m)
+         z0=-depth-1+Hh;            % hub depth (m)
          TIME=2*length(U1)-2;
          t_ReD=linspace(0,TIME,length(U1(:,1))); % time index
          d_ReD=linspace(-depth,0,length(U1(1,:))); % space (in z) index
@@ -148,8 +151,9 @@ Tr = (2*pi)/omega;          % period of rotation (s)
         
         %% PREPROCESSOR
         % ROTATONAL AUGMENTATION / STALL DELAY / SEPARATION POINT
-    
-        load S814_static_data
+        
+        file_foil = 'S814_static_data';
+        load(file_foil)
 
         [Values_360, Values_360r] = PreProcessor1(aoa,Cl_2d,Cd_2d,Cn_2d,Clin,LinRange,B,r,c,az);
 
@@ -213,7 +217,8 @@ for i=1:Blades
         
         % DRAG NON-ROTATIONAL
         
-        Cd_2dSt=interp1(aoa,Cd_2d,aE(:,:,i),'spline');
+        %Cd_2dSt=interp1(aoa,Cd_2d,aE(:,:,i),'spline');
+        Cd_2dSt=interp1(Values_360.Alpha,Values_360.Cd,aE(:,:,i),'spline');
         Cd_DS_2D(:,:,i)=Cd_Ind_2d+Cd_2dSt+(Cd_2dSt-Cd0).*Dvis_2d; 
                     
         % CALL DYNAMIC STALL SOLUTION
@@ -222,7 +227,7 @@ for i=1:Blades
             DS_3D(B,c,Values_360r,r,Cl_us(:,:,i),Cl_c,Cl_nc,Ds,aE(:,:,i),deg2rad(AoA(:,:,i)));        
                 
         % DRAG ROTATIONAL 
-        [Cd_DS_3D(:,:,i)] = UnstCD(Dvis,Cd_Ind,aoa,Cd_2d,Values_360r,aE(:,:,i),r,Cd0);
+        [Cd_DS_3D(:,:,i)] = UnstCD(Dvis,Cd_Ind,Values_360,Values_360r,aE(:,:,i),r,Cd0);
     
         
         % Quasi-steady (2D) coefficients
@@ -271,7 +276,7 @@ end
 
         %% STEADY ANALYSIS
         
-        [P_s, T_s, Cl_S3d, Cd_S3d, CN_S3d, CT_S3d, AoA_s, MZs, MXs, f] = Steady(U0,TSR,pitch,Blades,t,rho,omega,NBsec);
+        [P_s, T_s, Cl_S3d, Cd_S3d, CN_S3d, CT_S3d, AoA_s, MZs, MXs, f] = Steady(U0,TSR,pitch,t,rho,omega,NBsec,file_turb,file_foil);
 
 
         %% SEPERATION POINT
