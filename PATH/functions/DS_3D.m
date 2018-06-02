@@ -1,4 +1,4 @@
-function [Cn_DS, Ct_DS, Cl_DS, Dvis, Cd_Ind, ff, fff, VortexTracker] = DS_3D(B, c, Values_360r, r, Cp, Cn_c, Cn_nc, ds, aE, at)
+function [Cn_DS, Ct_DS, Cl_DS, Dvis, Cd_Ind, ff, fff, VortexTracker] = DS_3D(B, c, Values_360r, r, Cp, Cn_c, Cn_nc, ds, aE, at, file_ds)
 
 %       DYNAMIC STALL MODULE FOR NON-UNIFORM FORCING
 
@@ -22,7 +22,7 @@ faE=interp2(r,Values_360r.Alpha,Values_360r.F,rr,(aE),'spline');
 InRange=(faE>0);
 faE=faE.*InRange;
 
-load S814_DS_parameters
+load(file_ds)
 
 % angle shift to account for rotational stall delay
 

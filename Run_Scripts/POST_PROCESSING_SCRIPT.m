@@ -76,15 +76,15 @@ clear, clc, close all
 
 % TSR=3.5;                   % tip speed ratio
 % file_sim = 'ReDAPT_Unsteady_TSR_3p5';
-% Pitch = 1.2;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+% Pitch = 1.2;               % pitch angle (deg) 
 
 % TSR=4.0;                   % tip speed ratio
 % file_sim = 'ReDAPT_Unsteady_TSR_4';
-% Pitch = 0.2;              % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+% Pitch = 0.2;              % pitch angle (deg) 
 
 TSR=4.5;                   % tip speed ratio
 file_sim = 'ReDAPT_Unsteady_TSR_4p5';
-Pitch = 0.9;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+Pitch = 0.1;               % pitch angle (deg) 
 
 load(file_sim)
 
@@ -157,7 +157,7 @@ Tr = (2*pi)/omega;          % period of rotation (s)
 
         [Values_360, Values_360r] = PreProcessor1(aoa,Cl_2d,Cd_2d,Cn_2d,Clin,LinRange,B,r,c,az);
 
-        
+        file_ds ='S814_DS_parameters';
          %% LOAD UNSTEADY INDUCTION FACTORS DETERMINED BY COUPLED MODEL
        
         Axial_induction(1,:)=[];
@@ -213,7 +213,7 @@ for i=1:Blades
         % CALL DYNAMIC STALL SOLUTION
         % NON-ROTATIONAL SOLUTION
         [~,~,Cl_DS_2D(:,:,i), Dvis_2d, Cd_Ind_2d, ff_2d(:,:,i), fff_2d(:,:,i), VortexTracker_2d(:,:,1)] =.....
-            DS_2D(Values_360,Cl_us(:,:,i),Cl_c,Cl_nc,Ds,aE(:,:,i),deg2rad(AoA(:,:,i)));
+            DS_2D(Values_360,Cl_us(:,:,i),Cl_c,Cl_nc,Ds,aE(:,:,i),deg2rad(AoA(:,:,i)),file_ds);
         
         % DRAG NON-ROTATIONAL
         
@@ -224,7 +224,7 @@ for i=1:Blades
         % CALL DYNAMIC STALL SOLUTION
         % ROTATIONAL AUGMENTATION SOLUTION
         [~,~,Cl_DS_3D(:,:,i), Dvis, Cd_Ind, ff_3d(:,:,i), fff_3d(:,:,i), VortexTracker_3d(:,:,1)] =.....
-            DS_3D(B,c,Values_360r,r,Cl_us(:,:,i),Cl_c,Cl_nc,Ds,aE(:,:,i),deg2rad(AoA(:,:,i)));        
+            DS_3D(B,c,Values_360r,r,Cl_us(:,:,i),Cl_c,Cl_nc,Ds,aE(:,:,i),deg2rad(AoA(:,:,i)),file_ds);        
                 
         % DRAG ROTATIONAL 
         [Cd_DS_3D(:,:,i)] = UnstCD(Dvis,Cd_Ind,Values_360,Values_360r,aE(:,:,i),r,Cd0);

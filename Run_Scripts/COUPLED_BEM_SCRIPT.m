@@ -120,13 +120,13 @@ clear, clc, close all
 
         %% PREPROCESSOR
         % ROTATONAL AUGMENTATION / STALL DELAY / SEPARATION POINT
-    
+        
         file_foil = 'S814_static_data';
         load(file_foil)
         
         [Values_360, Values_360r] = PreProcessor1(aoa,Cl_2d,Cd_2d,Cn_2d,Clin,LinRange,B,r,c,az);
         
-
+        file_ds ='S814_DS_parameters';
         %% INITIAL CONDITIONS  
         
         % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
@@ -206,7 +206,7 @@ while Err > Ep
         
         % CALL DYNAMIC STALL SOLUTION
         % ROTATIONAL AUGMENTATION SOLUTION
-        [~, ~, Cl_DS_3d(:,:,ii), Dvis, Cd_Ind ,~ ,~ ,~] = DS_3D(B,c,Values_360r,r,Cl_US,Cl_c,Cl_nc,Ds,aE,deg2rad(AoA(:,:,ii)));
+        [~, ~, Cl_DS_3d(:,:,ii), Dvis, Cd_Ind ,~ ,~ ,~] = DS_3D(B,c,Values_360r,r,Cl_US,Cl_c,Cl_nc,Ds,aE,deg2rad(AoA(:,:,ii)),file_ds);
         
         % DRAG
         

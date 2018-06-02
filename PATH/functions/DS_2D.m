@@ -1,4 +1,4 @@
-function [Cn_DS, Ct_DS, Cl_DS, Dvis, Cd_Ind, ff, fff, VortexTracker] = DS_2D(Values_360, Cp, Cn_c, Cn_nc, ds,aE,at)
+function [Cn_DS, Ct_DS, Cl_DS, Dvis, Cd_Ind, ff, fff, VortexTracker] = DS_2D(Values_360, Cp, Cn_c, Cn_nc, ds,aE,at,file_ds)
 
 % DYNAMIC STALL MODULE FOR NON-UNIFORM FORCING
 
@@ -22,7 +22,7 @@ faE=interp1(Values_360.Alpha,Values_360.F,aE,'spline');
 InRange=(faE>0);
 faE=faE.*InRange;
 
-load S814_DS_parameters
+load(file_ds)
 
 da1=ads0-ass;
                 
