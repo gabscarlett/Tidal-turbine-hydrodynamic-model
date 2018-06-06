@@ -84,14 +84,14 @@ clear, clc, close all
 
         % Operating conditions 
         
-        % TSR=3.5;                   % tip speed ratio
-        % Pitch = 1.2;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+        % TSR=3.5;                   % tip speed ratio7
+        % Pitch = 1.2;               % pitch angle (deg)
 
         % TSR=4.0;                   % tip speed ratio
-        % Pitch = 0.2;              % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+        % Pitch = 0.2;              % pitch angle (deg)
 
         TSR=4.5;                   % tip speed ratio
-        Pitch = 0.9;               % pitch angle (deg) 4.5 = 0.9, 4 = 0.2, 3.5 = 1.2,
+        Pitch = 0.1;               % pitch angle (deg) 
         
         U0=2.77;                    % streamwise current (m/s)
         ZTb=18;                     % distance from bed to the hub centre (m)
