@@ -1,18 +1,9 @@
 Unsteady loading on tidal turbine blades
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%                                                                 %%%
-%%%       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     %%%
-%%%       %%%%%% Written by Gabriel Scarlett August 2017 %%%%%%     %%%
-%%%       %%%%%%     The University of Edinburgh, UK     %%%%%%     %%%
-%%%       %%%%%%         School of Engineering           %%%%%%     %%%
-%%%       %%%%%%       Institute for Energy Systems      %%%%%%     %%%
-%%%       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     %%%
-%%%                                                                 %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Written by Gabriel T Scarlett August 2017.
+The University of Edinburgh, School of Engineering, Institute for Energy Systems.
 
-Prerequisites
-
+PREREQUISITES
 
 This code will NOT work with versions of MATLAB earlier than R2016b. Please, make sure that the following version and toolboxes are installed.
 
