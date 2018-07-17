@@ -24,7 +24,9 @@ pitch=deg2rad(Pitch);   % operational pitch angle (rad)
 
 %%%%%%%%%%%%%%%%%%%% Turbine specifications %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-load TGL_BLADE_PROFILE % THIS IS THE FULL SCALE TGL BLADE GIVEN BY GRETTON
+%load TGL_BLADE_PROFILE % THIS IS THE FULL SCALE TGL BLADE GIVEN BY GRETTON
+
+load TGL_TURBINE % THIS IS THE FULL SCALE TGL BLADE GIVEN BY GRETTON
 
 NBsec = 100; % number of blade sections
 
@@ -111,7 +113,6 @@ ax1=subplot(2,1,1); % CP
 plot(ax1,TSR,CP,'ko',TSR_Adyn,CP_Adyn,'k:',x1,y1,'r--')
 ylabel('$$C_P$$')
 xlabel('$$\lambda$$')
-legend boxoff
 grid off
 axis([0 8 0 0.6])
 

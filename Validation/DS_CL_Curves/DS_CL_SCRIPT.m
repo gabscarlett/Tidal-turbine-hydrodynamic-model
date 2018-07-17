@@ -25,7 +25,7 @@ graph_settings
 
 % LOAD DATA
 
-file_turb ='TGL_BLADE_PROFILE';
+file_turb ='TGL_TURBINE';
 load(file_turb)                         % load turbine blade profile
 r=rad; % radial position on blade
 
