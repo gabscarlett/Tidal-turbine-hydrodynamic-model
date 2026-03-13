@@ -1,6 +1,8 @@
+Note: This is the legacy version of the model cited in academic publications (e.g., Scarlett, 2019; Scarlett & Viola, 2020). This repository is maintained for citation compatibility and reproducibility. For the latest object-oriented implementation, which offers improved modularity and performance, please visit the transTide repository.
+
 Unsteady loading on tidal turbine blades
 
-Written by Gabriel T Scarlett August 2017.
+Written by Gabriel T Scarlett August 2016
 The University of Edinburgh, School of Engineering, Institute for Energy Systems.
 
 PREREQUISITES
